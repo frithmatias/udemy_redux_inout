@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/auth';
+import { AuthService } from './auth/auth.service';
 
 @Component({
 	selector: 'app-root',
@@ -8,17 +8,10 @@ import { AngularFireAuth } from '@angular/fire/auth';
 })
 export class AppComponent implements OnInit {
 	title = 'inOutApp';
-	constructor(private afAuth: AngularFireAuth) {
-		// puedo llamarlo desde el constructor o desde ngOnInit que es un cilco de vida e mi componente
-		// this.initAuthListener();
-	}
+
+	constructor(public authService: AuthService) {}
 
 	ngOnInit() {
-		this.initAuthListener();
-	}
-	initAuthListener() {
-		this.afAuth.authState.subscribe((dataUser: any) => {
-			console.log(dataUser);
-		});
+		this.authService.initAuthListener();
 	}
 }
