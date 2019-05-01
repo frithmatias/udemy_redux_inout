@@ -1,5 +1,5 @@
 import * as fromAuth from './auth.actions';
-import { User } from '../models/user.model';
+import { User } from './user.model';
 
 export interface AuthState {
 	user: User;
@@ -22,6 +22,10 @@ export function authReducer(state = estadoInicial, action: fromAuth.acciones): A
 				// de objeto que dentro tiene un tipo User. { user: User }. Si yo hago un return { user: {} }
 				// vacío me va a mostrar un error de que no coinciden los tipos.
 				user: { ...action.user }
+			};
+		case fromAuth.UNSET_USER:
+			return {
+				user: null
 			};
 		default:
 			return state;

@@ -1,6 +1,6 @@
 import { Injectable, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { User } from '../models/user.model';
+import { User } from './user.model';
 import { map } from 'rxjs/operators';
 
 // SWEET ALERT
@@ -16,15 +16,17 @@ import { AppState } from '../app.reducer';
 
 // NGRX: Accion
 import { ActivarLoadingAction, DesactivarLoadingAction } from '../shared/ui.actions';
-import { SetUserAction } from './auth.actions';
+import { SetUserAction, UnsetUserAction } from './auth.actions';
 
 // RXJS
 import { Subscription } from 'rxjs';
+import { UnsetItemsActions } from '../ingreso-egreso/ingreso-egreso.actions';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class AuthService {
+	public fbUser: User;
 	//  private subscription: Subscription;
 	private subscription: Subscription = new Subscription();
 	constructor(
@@ -39,29 +41,33 @@ export class AuthService {
 	}
 
 	initAuthListener() {
-		console.log('Subscribiendo a authState desde auth.service');
 		this.afAuth.authState.subscribe((fbUser: firebase.User) => {
-			console.log('fbUser:', fbUser); // Objeto con toda la info que me devuelve firebase
+			//console.log('fbUser:', fbUser); // Objeto con toda la info que me devuelve firebase
 
 			if (fbUser) {
-				this.afDB.collection('users').doc(`${fbUser.uid}`).valueChanges().subscribe((usuarioObj: any) => {
-					console.log('usuarioObj:', usuarioObj);
+				this.afDB.collection(`${fbUser.uid}`).doc(`usuario`).valueChanges().subscribe((usuarioObj: any) => {
+					// this.afDB.collection('users').doc(`${fbUser.uid}`).valueChanges().subscribe((usuarioObj: any) => {
+					// console.log('usuarioObj:', usuarioObj);
 
 					// usuarioObj NO es del tipo User, asi que creamos newUser de tipo User.
 					// const newUser = new User(usuarioObj.nombre, usuarioObj.email, usuarioObj.uid);
 
 					// Pero existe una forma para poder enviarle un objeto al modelo para no enviar todos los argumentos.
 					// Ver mas abajo como esta definido el modelo USER.MODEL.TS.
-
 					const newUser = new User(usuarioObj);
+
+					// Guardo el usuario ya definido de tipo User en el store y en mi objeto público fbUser.
+					this.fbUser = newUser;
+					// fbUser: User {nombre: "Matias Frith", email: "asdf@asdf.com", uid: "0ZJP5uHtOLd8WBPVrhHl5tTZZ4D2"}
+
 					this.store.dispatch(new SetUserAction(newUser));
-					console.log('newUser:', newUser);
+					// console.log('newUser:', newUser);
 				});
 			} else {
 				// Si yo me logueo con un usuario, luego hago un logout, y hago un login con OTRO usuario, voy a estar
 				// subscrito DOS VECES a DOS OBSERVABLES. Si hago cambios en cualquiera de esos dos usuarios voy a estar
 				// viendo sus cambios porque nunca me des suscirbi.
-
+				this.fbUser = null;
 				this.subscription.unsubscribe();
 
 				// Pero todavía hay un problema, si yo NO estoy autenticado, me va a dar un error que unsuscribe es undefined.
@@ -99,10 +105,10 @@ export class AuthService {
 					email: email
 				};
 
-				this.afDB.collection('users').doc(`${user.uid}`).set(user).then(() => {
-					// this.afDB.firestore.collection('users').add(user).then(() => { // funciona perfectamente
-					// this.afDB.doc(`${user.uid}/usuario`).set(user).then(() => {
-
+				//this.afDB.collection('users').doc(`${user.uid}`).set(user).then(() => {
+				// this.afDB.firestore.collection('users').add(user).then(() => { // funciona perfectamente
+				// this.afDB.doc(`${user.uid}/usuario`).set(user).then(() => {
+				this.afDB.collection(`${user.uid}`).doc(`usuario`).set(user).then(() => {
 					// de esta manera tengo el uid de Authentication -> Usuarios, en mi nueva colección con los datos
 					// del nuevo usuario.
 
@@ -148,6 +154,8 @@ export class AuthService {
 	logout() {
 		this.router.navigate([ '/login' ]);
 		this.afAuth.auth.signOut(); // Si hago un console.log del then() retorna 'undefined' ya que la promesa no retorna nada.
+		this.store.dispatch(new UnsetUserAction());
+		this.store.dispatch(new UnsetItemsActions());
 	}
 
 	isAuth() {
@@ -159,5 +167,10 @@ export class AuthService {
 				return fbUser != null;
 			})
 		);
+	}
+
+	// NECESITO romper con la referencia del objeto fbUser y mandar un NUEVO objeto.
+	getUsuario() {
+		return { ...this.fbUser };
 	}
 }

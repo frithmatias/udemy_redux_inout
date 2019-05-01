@@ -21,7 +21,7 @@ import { FooterComponent } from './shared/footer/footer.component';
 import { NavbarComponent } from './shared/navbar/navbar.component';
 import { SidebarComponent } from './shared/sidebar/sidebar.component';
 import { AppRoutingModule } from './app-routing.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // FIREBASE
 import { AngularFireModule } from '@angular/fire';
@@ -30,11 +30,15 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { environment } from 'src/environments/environment';
 
+// NG2 CHARTS
+import { ChartsModule } from 'ng2-charts';
+
 // NGRX
 import { StoreModule } from '@ngrx/store';
 import { appReducers } from './app.reducer';
 // import { uiReducer } from './shared/ui.reducer';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { OrdenIngresoEgresoPipe } from './ingreso-egreso/orden-ingreso-egreso.pipe';
 
 @NgModule({
 	declarations: [
@@ -47,15 +51,18 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 		DetalleComponent,
 		FooterComponent,
 		NavbarComponent,
-		SidebarComponent
+		SidebarComponent,
+		OrdenIngresoEgresoPipe
 	],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,
 		FormsModule,
+		ReactiveFormsModule,
 		AngularFireModule.initializeApp(environment.firebase),
 		AngularFirestoreModule,
 		AngularFireAuthModule,
+		ChartsModule,
 		// StoreModule.forRoot({ ui: uiReducer }),
 		StoreModule.forRoot(appReducers),
 		StoreDevtoolsModule.instrument({
