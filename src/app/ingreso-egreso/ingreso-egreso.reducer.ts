@@ -1,11 +1,17 @@
 import * as fromIngresoEgreso from './ingreso-egreso.actions';
 import { IngresoEgreso } from './ingreso-egreso.model';
+import { AppState } from '../app.reducer';
 
 export interface IngresoEgresoState {
 	items: IngresoEgreso[]; // Array de ingresos y egresos
 }
 
+export interface AppState extends AppState {
+	inout: IngresoEgresoState;
+}
+
 const estadoInicial: IngresoEgresoState = {
+	// items: [ { description: 'hola', monto: 1, tipo: 'tal', uid: '0' } ]
 	items: []
 };
 

@@ -1,11 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AppState } from 'src/app/app.reducer';
 import { Store } from '@ngrx/store';
 import { IngresoEgreso } from '../ingreso-egreso.model';
 import { Subscription } from 'rxjs';
 import { IngresoEgresoService } from '../ingreso-egreso.service';
 import { ActivarLoadingAction, DesactivarLoadingAction } from 'src/app/shared/ui.actions';
 import Swal from 'sweetalert2';
+
+// STORE
+import { AppState } from 'src/app/app.reducer';
+import * as fromIngresoEgreso from '../ingreso-egreso.reducer';
 
 @Component({
 	selector: 'app-detalle',
@@ -18,7 +21,7 @@ export class DetalleComponent implements OnInit, OnDestroy {
 	loading: boolean;
 	loadingSub: Subscription = new Subscription();
 
-	constructor(private store: Store<AppState>, private ingresoEgreso: IngresoEgresoService) {
+	constructor(private store: Store<fromIngresoEgreso.AppState>, private ingresoEgreso: IngresoEgresoService) {
 		this.itemsSub = this.store.select('inout').subscribe((data) => {
 			console.log(data.items);
 			this.items = data.items;

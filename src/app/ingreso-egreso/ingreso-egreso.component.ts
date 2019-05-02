@@ -4,10 +4,12 @@ import { IngresoEgreso } from './ingreso-egreso.model';
 import { AuthService } from '../auth/auth.service';
 import { IngresoEgresoService } from './ingreso-egreso.service';
 import Swal from 'sweetalert2';
-import { AppState } from '../app.reducer';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ActivarLoadingAction, DesactivarLoadingAction } from '../shared/ui.actions';
+// STORE
+// import { AppState } from '../app.reducer';
+import * as fromIngresoEgreso from './ingreso-egreso.reducer';
 
 @Component({
 	selector: 'app-ingreso-egreso',
@@ -20,7 +22,11 @@ export class IngresoEgresoComponent implements OnInit, OnDestroy {
 	loading: boolean;
 	loadingsub: Subscription = new Subscription();
 
-	constructor(private inOut: IngresoEgresoService, private auth: AuthService, private store: Store<AppState>) {}
+	constructor(
+		private inOut: IngresoEgresoService,
+		private auth: AuthService,
+		private store: Store<fromIngresoEgreso.AppState>
+	) {}
 
 	ngOnInit() {
 		this.loadingsub = this.store.select('ui').subscribe((ui) => {
@@ -32,8 +38,6 @@ export class IngresoEgresoComponent implements OnInit, OnDestroy {
 		});
 	}
 	ngOnDestroy(): void {
-		//Called once, before the instance is destroyed.
-		//Add 'implements OnDestroy' to the class.
 		this.loadingsub.unsubscribe();
 	}
 	crearIngresoEgreso() {
